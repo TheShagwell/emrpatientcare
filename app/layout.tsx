@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { Bai_Jamjuree } from "next/font/google";
+import { Nunito_Sans } from "next/font/google";
 import "./globals.css";
 
 import { cn } from "@/lib/utils";
 
-const fontSans = Bai_Jamjuree({
+const fontSans = Nunito_Sans({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
   variable: "--font-sans",
