@@ -3,9 +3,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import CustomField from "../CustomField";
+import SubmitButton from "../SubmitButton";
 
 export enum FormFieldType {
   INPUT = "input",
@@ -72,7 +72,7 @@ const PatientForm = () => {
           iconAlt="phone"
         />
 
-        <Button type="submit">Submit</Button>
+        <SubmitButton/>
       </form>
     </Form>
   );
