@@ -7,44 +7,91 @@ import { Form, FormControl } from "@/components/ui/form";
 import CustomField from "../CustomField";
 import SubmitButton from "../SubmitButton";
 import { useState } from "react";
-import { UserFormValidation } from "@/lib/validation";
+import { PatientFormValidation } from "@/lib/validation";
 import { useRouter } from "next/navigation";
-import { createUser } from "@/lib/actions/patient.actions";
 import { FormFieldType } from "./PatientForm";
-import { Doctors, GenderOptions, IdentificationTypes } from "@/constants";
+import {
+  Doctors,
+  GenderOptions,
+  IdentificationTypes,
+  PatientFormDefaultValues,
+} from "@/constants";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Label } from "../ui/label";
 import { SelectItem } from "../ui/select";
 import Image from "next/image";
 import { FileUploader } from "../FileUploader";
+import { registerPatient } from "@/lib/actions/patient.actions";
 
-const RegisterForm = () => {
-  const router = useRouter();
+const RegisterForm = ({ user } : { user: User}) => {
+    const router = useRouter();
   const [isLoading, setisLoading] = useState(false);
-  const form = useForm<z.infer<typeof UserFormValidation>>({
-    resolver: zodResolver(UserFormValidation),
+  const form = useForm<z.infer<typeof PatientFormValidation>>({
+    resolver: zodResolver(PatientFormValidation),
     defaultValues: {
+      ...PatientFormDefaultValues,
       name: "",
       email: "",
       phone: "",
     },
   });
 
-  async function onSubmit({
-    name,
-    email,
-    phone,
-  }: z.infer<typeof UserFormValidation>) {
+  async function onSubmit(values: z.infer<typeof PatientFormValidation>) {
     setisLoading(true);
+
+    // Store file info in form data as
+    let formData;
+    // Add file data to form data if provided
+    if (
+      values.identificationDocument &&
+      values.identificationDocument?.length > 0
+    ) {
+      const blobFile = new Blob([values.identificationDocument[0]], {
+        type: values.identificationDocument[0].type,
+      });
+
+      formData = new FormData();
+      formData.append("blobFile", blobFile);
+      formData.append("fileName", values.identificationDocument[0].name);
+    }
+
     try {
-      const userData = { name, email, phone };
+      const patient = {
+        userId: user.$id,
+        name: values.name,
+        email: values.email,
+        phone: values.phone,
+        birthDate: new Date(values.birthDate),
+        gender: values.gender,
+        address: values.address,
+        occupation: values.occupation,
+        emergencyContactName: values.emergencyContactName,
+        emergencyContactNumber: values.emergencyContactNumber,
+        primaryPhysician: values.primaryPhysician,
+        insuranceProvider: values.insuranceProvider,
+        insurancePolicyNumber: values.insurancePolicyNumber,
+        allergies: values.allergies,
+        currentMedication: values.currentMedication,
+        familyMedicalHistory: values.familyMedicalHistory,
+        pastMedicalHistory: values.pastMedicalHistory,
+        identificationType: values.identificationType,
+        identificationNumber: values.identificationNumber,
+        identificationDocument: values.identificationDocument
+          ? formData
+          : undefined,
+        privacyConsent: values.privacyConsent,
+      };
 
-      const newUser = await createUser(userData);
+      const newPatient = await registerPatient(patient);
 
-      if (newUser) return router.push(`/patients/${newUser.$id}/register`);
+      if (newPatient) {
+        router.push(`/patients/${user.$id}/new-appointment`);
+      }
     } catch (error) {
       console.log(error);
     }
+
+    setisLoading(false);
   }
   return (
     <Form {...form}>
@@ -92,13 +139,13 @@ const RegisterForm = () => {
               placeholder="(555) 123-4567"
             />
           </div>
-          
+
           <div className="flex flex-col gap-6 xl:flex-row">
             <CustomField
-                fieldType={FormFieldType.DATE_PICKER}
-                control={form.control}
-                name="birthDate"
-                label="Date of Birth"
+              fieldType={FormFieldType.DATE_PICKER}
+              control={form.control}
+              name="birthDate"
+              label="Date of Birth"
             />
             <CustomField
               fieldType={FormFieldType.SKELETON}
@@ -288,6 +335,35 @@ const RegisterForm = () => {
                 <FileUploader files={field.value} onChange={field.onChange} />
               </FormControl>
             )}
+          />
+        </section>
+
+        <section className="space-y-6">
+          <div className="mb-9 space-y-1">
+            <h2 className="sub-header">Consent and Privacy</h2>
+          </div>
+
+          <CustomField
+            fieldType={FormFieldType.CHECKBOX}
+            control={form.control}
+            name="treatmentConsent"
+            label="I consent to receive treatment for my health condition."
+          />
+
+          <CustomField
+            fieldType={FormFieldType.CHECKBOX}
+            control={form.control}
+            name="disclosureConsent"
+            label="I consent to the use and disclosure of my health
+            information for treatment purposes."
+          />
+
+          <CustomField
+            fieldType={FormFieldType.CHECKBOX}
+            control={form.control}
+            name="privacyConsent"
+            label="I acknowledge that I have reviewed and agree to the
+            privacy policy"
           />
         </section>
 
