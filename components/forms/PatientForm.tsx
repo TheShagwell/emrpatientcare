@@ -9,6 +9,7 @@ import SubmitButton from "../SubmitButton";
 import { useState } from "react";
 import { UserFormValidation } from "@/lib/validation";
 import { useRouter } from "next/navigation";
+import { createUser } from "@/lib/actions/patient.actions";
 
 export enum FormFieldType {
   INPUT = "input",
@@ -26,22 +27,24 @@ const PatientForm = () => {
   const form = useForm<z.infer<typeof UserFormValidation>>({
     resolver: zodResolver(UserFormValidation),
     defaultValues: {
-      username: "",
+      name: "",
       email: "",
       phone: "",
     },
   });
 
   async function onSubmit({
-    username,
+    name,
     email,
     phone,
   }: z.infer<typeof UserFormValidation>) {
     setisLoading(true);
     try {
-      // const userData = { username, email, phone };
-      // const user = await createUser(userData);
-      // if(user) router.push(`/patients/${user.id}/register`);
+      const userData = { name, email, phone };
+
+      const newUser = await createUser(userData);
+
+      if(newUser) return router.push(`/patients/${newUser.$id}/register`);
     } catch (error) {
       console.log(error);
     }
@@ -84,12 +87,12 @@ const PatientForm = () => {
           iconAlt="phone"
         />
 
-        <CustomField
+        {/* <CustomField
           fieldType={FormFieldType.DATE_PICKER}
           control={form.control}
           name="birthDate"
           label="Date of Birth"
-        />
+        /> */}
 
         <SubmitButton isLoading={isLoading}>Get Started</SubmitButton>
       </form>
