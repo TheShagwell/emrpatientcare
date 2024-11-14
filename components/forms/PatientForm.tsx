@@ -87,13 +87,6 @@ const PatientForm = () => {
           iconAlt="phone"
         />
 
-        {/* <CustomField
-          fieldType={FormFieldType.DATE_PICKER}
-          control={form.control}
-          name="birthDate"
-          label="Date of Birth"
-        /> */}
-
         <SubmitButton isLoading={isLoading}>Get Started</SubmitButton>
       </form>
     </Form>
