@@ -3,7 +3,7 @@ import { StatCard } from "@/components/StatCard";
 import Image from "next/image";
 import React from "react";
 import { getRecentAppointmentList } from "@/lib/actions/appointment.actions";
-import {DataTable} from "@/components/table/DataTable";
+import { DataTable } from "@/components/table/DataTable";
 import { columns } from "@/components/table/columns";
 
 
