@@ -8,3 +8,14 @@ This system is responsible for booking appointments for patient and accepting it
 - Appwrite
 - Shadcn ui
 - Nextjs Auth
+
+#### How to use
+Clone the application
+```bash
+ git clone 'github link'
+```
+
+Install the dependencies
+```bash 
+npm install
+```
